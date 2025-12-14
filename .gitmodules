@@ -1,0 +1,6 @@
+[submodule "dotfiles-bine"]
+	path = dotfiles-bine
+	url = git@github.com:lovc21/dotfiles-bine.git
+[submodule "dotfiles-razor"]
+	path = dotfiles-razor
+	url = git@github.com:lovc21/dotfiles-razor.git

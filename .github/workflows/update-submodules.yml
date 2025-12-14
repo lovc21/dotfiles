@@ -1,0 +1,75 @@
+name: Update Submodules on Change
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write 
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Check submodule updates
+        id: check
+        run: |
+          git submodule status > before.txt
+          git submodule update --remote --merge
+          git submodule status > after.txt
+          
+          if ! diff -q before.txt after.txt > /dev/null; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected:"
+            diff before.txt after.txt || true
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "All submodules up to date"
+          fi
+      
+      - name: Commit changes
+        if: steps.check.outputs.changes == 'true'
+        run: |
+          git add dotfiles-bine dotfiles-razor
+          
+          echo "🤖 Auto-update submodules" > commit_msg.txt
+          echo "" >> commit_msg.txt
+          echo "Updated submodules:" >> commit_msg.txt
+          echo "" >> commit_msg.txt
+          
+          for submodule in dotfiles-bine dotfiles-razor; do
+            if git diff --cached --quiet -- $submodule 2>/dev/null; then
+              continue
+            fi
+            
+            cd $submodule
+            LATEST_COMMIT=$(git log -1 --pretty=format:"%h - %s")
+            echo "- $submodule: $LATEST_COMMIT" >> ../commit_msg.txt
+            cd ..
+          done
+          
+          git commit -F commit_msg.txt
+          git push
+      
+      - name: Summary
+        if: steps.check.outputs.changes == 'true'
+        run: |
+          echo "## Submodules Updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          git submodule status >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
