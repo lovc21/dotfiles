@@ -15,19 +15,19 @@ My dotfiles configuration for managing multiple machines with different operatin
 
 **[dotfiles-bine](https://github.com/lovc21/dotfiles-bine)**
 
-My main laptop runs NixOS 25.11. I chose NixOS for its declarative configuration approach and reproducibility, plus it's a great opportunity to learn something new with a technology that's gaining popularity.
+My main laptop runs NixOS 25.11.
 
 ### Structure
 
-- **configuration.nix** - System-level configuration
+- **Flake-based** - using nixpkgs-unstable as the primary channel
 - **[home-manager](https://github.com/nix-community/home-manager)** - User-level dotfiles management
-- More features coming soon
+- **Basic scaffolding** - Organized into hosts/, home/, overlays/, and pkgs/
 
 ## Dotfiles 📂 Razor 🟠
 
 **[dotfiles-razor](https://github.com/lovc21/dotfiles-razor)**
 
-My backup laptop runs Ubuntu 24.04 for stability and reliability. This serves as a dependable fallback system when experimenting with configurations on my main machine.
+My backup laptop runs Ubuntu 24.04.
 
 ### Structure
 
