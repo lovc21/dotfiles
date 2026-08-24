@@ -29,7 +29,8 @@ jobs:
         id: check
         run: |
           git submodule status > before.txt
-          git submodule update --remote --merge
+          git submodule sync
+          git submodule update --init --remote --checkout
           git submodule status > after.txt
           
           if ! diff -q before.txt after.txt > /dev/null; then
